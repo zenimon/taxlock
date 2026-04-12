@@ -1,0 +1,14 @@
+{
+    "name": "tax-flow-workspace",
+    "version": "1.0.0",
+    "description": "TaxFlow unified workspace",
+    "scripts": {
+        "install:all": "npm install --prefix money-back && npm install --prefix frontend",
+        "dev:backend": "npm run dev --prefix money-back",
+        "dev:frontend": "npm run dev --prefix frontend",
+        "dev": "npx concurrently \"npm run dev:backend\" \"npm run dev:frontend\""
+    },
+    "devDependencies": {
+        "concurrently": "^8.2.2"
+    }
+}
