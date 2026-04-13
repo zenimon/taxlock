@@ -1,12 +1,12 @@
 import { ArrowRight, Zap, Shield, BarChart3, Webhook, Code, Layers } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Button } from '../ui/Button';
-import { PublicNav } from '../layout/PublicNav';
-import HeroSection from './HeroSection';
-import FeatureGrid from './FeatureGrid';
-import HowItWorks from './HowItWorks';
-import PricingCards from './PricingCards';
-import CtaBanner from './CtaBanner';
+import { Button } from '../../components/ui/Button';
+import { PublicNav } from '../../components/layout/PublicNav';
+import HeroSection from '../../components/hero/HeroSection';
+import FeatureGrid from '../../components/hero/FeatureGrid';
+import HowItWorks from '../../components/hero/HowItWorks';
+import PricingCards from '../../components/hero/PricingCards';
+import CtaBanner from '../../components/hero/CtaBanner';
 
 export default function Hero() {
   return (
