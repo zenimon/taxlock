@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Layout } from './components/layout/Layout';
 import Playground from './pages/Playground/Playground';
 import Simulation from './pages/Simulation/Simulation';
+import Docs from './pages/Docs';
 
 // Simple placeholder components for other routes
 const Overview = () => (
@@ -28,15 +29,18 @@ const Overview = () => (
 function App() {
   return (
     <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Overview />} />
-          <Route path="/playground" element={<Playground />} />
-          <Route path="/simulation" element={<Simulation />} />
-          <Route path="/rules" element={<div className="text-2xl font-bold">Rules Engine (Coming Soon)</div>} />
-          <Route path="/history" element={<div className="text-2xl font-bold">History (Coming Soon)</div>} />
-        </Routes>
-      </Layout>
+      <Routes>
+        {/* Docs routes - outside Layout to have full control of layout */}
+        <Route path="/docs" element={<Docs />} />
+        <Route path="/docs/:section" element={<Docs />} />
+        
+        {/* Main app routes with Layout */}
+        <Route path="/" element={<Layout><Overview /></Layout>} />
+        <Route path="/playground" element={<Layout><Playground /></Layout>} />
+        <Route path="/simulation" element={<Layout><Simulation /></Layout>} />
+        <Route path="/rules" element={<Layout><div className="text-2xl font-bold">Rules Engine (Coming Soon)</div></Layout>} />
+        <Route path="/history" element={<Layout><div className="text-2xl font-bold">History (Coming Soon)</div></Layout>} />
+      </Routes>
     </Router>
   );
 }
