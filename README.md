@@ -5,7 +5,7 @@
 TaxFlow intercepts money events in real time and provides automated fund-splitting strategies (tax reserves, operations, growth capital) and risk-gating for outbound payments.
 
 see the pitch deck - [text](https://drive.google.com/file/d/1rks_ZXWdZtRO3DjSGsvDlTOL7N7MOdSp/view?usp=sharing)
-live link - [text](https://taxlock-1.onrender.com)
+live link(coming soon) - [text](https://taxlock-1.onrender.com)
 
 ## 🚀 Quick Start
 
