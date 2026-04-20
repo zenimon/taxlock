@@ -41,7 +41,7 @@ const CodeBlock = ({ language, code, filename }) => {
   // Highlight code when it changes
   useEffect(() => {
     if (window.hljs && code) {
-      const blocks = document.querySelectorAll(`[data-code-block-${language}]`);
+      const blocks = document.querySelectorAll(`[data-code-block="${language}"]`);
       blocks.forEach(block => {
         window.hljs.highlightElement(block);
       });
@@ -97,10 +97,10 @@ const CodeBlock = ({ language, code, filename }) => {
       )}
 
       {/* Code content */}
-      <pre className="p-4 overflow-x-auto text-sm leading-relaxed">
+      <pre className="p-4 overflow-x-auto text-sm leading-relaxed text-gray-100">
         <code
           data-code-block={language}
-          className={`language-${language === 'curl' || language === 'bash' ? 'bash' : language}`}
+          className={`language-${language === 'curl' || language === 'bash' ? 'bash' : language} text-gray-100`}
         >
           {code}
         </code>

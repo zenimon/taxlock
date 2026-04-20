@@ -1,5 +1,5 @@
 /**
- * Decision API Documentation Content
+ * TaxFlow Documentation Content
  * All endpoint data, examples, and schema definitions
  */
 
@@ -7,18 +7,18 @@ export const docSections = [
   {
     id: 'overview',
     title: 'Overview',
-    group: 'Introduction',
+    group: 'Overview',
     content: {
-      title: 'Decision API',
+      title: 'TaxFlow',
       subtitle: 'Embedded financial intelligence for SMBs',
       sections: [
         {
           heading: 'Introduction',
-          content: `The Decision API is an embedded financial intelligence layer for small and medium businesses. It sits between money flowing in and money going out — every transaction is automatically allocated across fund buckets (tax, operations, growth capital) and every proposed spend is risk-assessed before it leaves.`
+          content: `The TaxFlow is an embedded financial intelligence layer for small and medium businesses. It sits between money flowing in and money going out — every transaction is automatically allocated across fund buckets (tax, operations, growth capital) and every proposed spend is risk-assessed before it leaves.`
         },
         {
           heading: 'The core problem',
-          content: `Most SMBs mix all funds in a single account and make spending decisions without understanding their future obligations. The Decision API prevents this by:
+          content: `Most SMBs mix all funds in a single account and make spending decisions without understanding their future obligations. The TaxFlow prevents this by:
 
 • Automatically splitting every incoming payment the moment it arrives
 • Scoring every proposed expense against current balances and historical patterns
@@ -47,7 +47,7 @@ The API is stateless per request. Every call returns a complete decision — you
   {
     id: 'authentication',
     title: 'Authentication',
-    group: 'Introduction',
+    group: 'Authentication',
     content: {
       title: 'Authentication',
       sections: [
@@ -116,7 +116,7 @@ api.interceptors.response.use(
   {
     id: 'errors',
     title: 'Errors',
-    group: 'Introduction',
+    group: 'Overview',
     content: {
       title: 'Error Handling',
       sections: [
@@ -195,7 +195,7 @@ except requests.HTTPError as e:
   {
     id: 'rate-limiting',
     title: 'Rate Limiting',
-    group: 'Introduction',
+    group: 'Overview',
     content: {
       title: 'Rate Limiting',
       sections: [
@@ -247,6 +247,32 @@ When the limit is hit you receive HTTP 429. Implement exponential backoff: wait 
           }
         }
       ]
+    }
+  },
+  {
+    id: 'health',
+    title: 'Health',
+    group: 'Overview',
+    content: {
+      title: 'GET /health',
+      method: 'GET',
+      path: '/health',
+      description: 'Check API status. No authentication required.',
+      responseExample: {
+        status: 'ok',
+        version: '1.0.0',
+        uptime: 3600,
+        timestamp: '2026-04-12T10:30:00Z'
+      },
+      codeExamples: {
+        curl: `curl https://api.decisionapi.dev/v1/health`,
+        nodejs: `const { data } = await client.get('/health');
+console.log('API status:', data.status);`,
+        python: `res = requests.get(f"{BASE}/health")
+print(res.json())`,
+        go: `req, _ := http.NewRequest("GET", BASE+"/health", nil)
+resp, err := http.DefaultClient.Do(req)`
+      }
     }
   },
   {
@@ -1028,6 +1054,39 @@ def handle_webhook():
     }
   },
   {
+    id: 'webhooks/list',
+    title: 'List Webhooks',
+    group: 'Webhooks',
+    content: {
+      title: 'GET /webhooks',
+      method: 'GET',
+      path: '/webhooks',
+      description: 'List all registered webhooks for your tenant.',
+      responseExample: {
+        data: [
+          {
+            id: 'wh_9f2c',
+            url: 'https://yourapp.com/webhooks/decision',
+            events: ['transaction.allocated', 'risk.flagged'],
+            enabled: true,
+            createdAt: '2026-04-01T09:00:00Z'
+          }
+        ]
+      },
+      codeExamples: {
+        curl: `curl https://api.decisionapi.dev/v1/webhooks \\
+  -H "X-API-Key: dev-key-001"`,
+        nodejs: `const { data } = await client.get('/webhooks');
+console.log('Webhooks:', data.data.length);`,
+        python: `res = requests.get(f"{BASE}/webhooks", headers=HEADERS)
+print(res.json())`,
+        go: `req, _ := http.NewRequest("GET", BASE+"/webhooks", nil)
+req.Header.Set("X-API-Key", apiKey)
+resp, err := http.DefaultClient.Do(req)`
+      }
+    }
+  },
+  {
     id: 'webhooks/register',
     title: 'Register Webhook',
     group: 'Webhooks',
@@ -1152,9 +1211,193 @@ req.Header.Set("X-API-Key", apiKey)`
     }
   },
   {
+    id: 'quickstart-guides',
+    title: 'Quickstart',
+    group: 'Overview',
+    content: {
+      title: 'Quickstart Guide',
+      sections: [
+        {
+          heading: 'Step 1 — Get your API key',
+          content: `Local dev (no signup needed): use dev-key-001.
+
+Production: sign up at https://app.decisionapi.dev, then copy your key from Settings > API Keys.`
+        },
+        {
+          heading: 'Step 2 — Make your first request (cURL)',
+          codeExample: {
+            language: 'bash',
+            code: `curl -X POST http://localhost:3000/api/v1/transaction/allocate \\
+  -H "X-API-Key: dev-key-001" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "transactionId": "my_first_txn",
+    "amount": 100000,
+    "currency": "INR",
+    "source": "invoice"
+  }'`
+          }
+        },
+        {
+          heading: 'Expected response',
+          codeExample: {
+            language: 'json',
+            code: `{
+  "allocationId": "alloc_4b7f",
+  "transactionId": "my_first_txn",
+  "totalAmount": 100000,
+  "currency": "INR",
+  "allocations": [
+    { "bucket": "tax", "percentage": 18, "amount": 18000 },
+    { "bucket": "operations", "percentage": 52, "amount": 52000 },
+    { "bucket": "growth", "percentage": 30, "amount": 30000 }
+  ],
+  "ruleApplied": "system_default",
+  "processedAt": "2026-04-12T10:30:00Z"
+}`
+          }
+        },
+        {
+          heading: 'Node.js example',
+          codeExample: {
+            language: 'javascript',
+            code: `require('dotenv').config();
+const axios = require('axios');
+
+const api = axios.create({
+  baseURL: process.env.API_BASE || 'http://localhost:3000/api/v1',
+  headers: { 'X-API-Key': process.env.API_KEY || 'dev-key-001' }
+});
+
+async function main() {
+  const { data: alloc } = await api.post('/transaction/allocate', {
+    transactionId: 'my_first_txn',
+    amount: 100000,
+    currency: 'INR',
+    source: 'invoice',
+  });
+  alloc.allocations.forEach((a) => {
+    console.log(\`\${a.bucket}: ₹\${a.amount} (\${a.percentage}%)\`);
+  });
+
+  const { data: risk } = await api.post('/transaction/assess', {
+    amount: 25000,
+    currency: 'INR',
+    category: 'vendor',
+  });
+  console.log(\`Spend of ₹25,000: \${risk.recommendation} (score \${risk.risk.score})\`);
+}
+
+main().catch(console.error);`
+          }
+        },
+        {
+          heading: 'Python example',
+          codeExample: {
+            language: 'python',
+            code: `import os, requests
+from dotenv import load_dotenv
+
+load_dotenv()
+BASE = os.getenv("API_BASE", "http://localhost:3000/api/v1")
+HEADERS = {"X-API-Key": os.getenv("API_KEY", "dev-key-001")}
+
+def allocate(transaction_id: str, amount: float) -> dict:
+    res = requests.post(
+        f"{BASE}/transaction/allocate",
+        json={"transactionId": transaction_id, "amount": amount, "currency": "INR", "source": "invoice"},
+        headers={**HEADERS, "X-Idempotency-Key": transaction_id},
+    )
+    res.raise_for_status()
+    return res.json()
+
+def assess(amount: float, category: str) -> str:
+    res = requests.post(
+        f"{BASE}/transaction/assess",
+        json={"amount": amount, "currency": "INR", "category": category},
+        headers=HEADERS,
+    )
+    res.raise_for_status()
+    return res.json()["recommendation"]`
+          }
+        },
+        {
+          heading: 'Step 3 — Create a rule',
+          codeExample: {
+            language: 'bash',
+            code: `curl -X POST http://localhost:3000/api/v1/rules \\
+  -H "X-API-Key: dev-key-001" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "name": "Large invoice — extra tax reserve",
+    "trigger": {
+      "event": "transaction.received",
+      "conditions": [
+        { "field": "amount", "operator": "gte", "value": 100000 },
+        { "field": "source", "operator": "eq", "value": "invoice" }
+      ]
+    },
+    "action": {
+      "type": "allocate",
+      "params": {
+        "buckets": [
+          { "bucket": "tax", "percentage": 22 },
+          { "bucket": "operations", "percentage": 48 },
+          { "bucket": "growth", "percentage": 30 }
+        ]
+      }
+    },
+    "priority": 10
+  }'`
+          }
+        },
+        {
+          heading: 'Step 4 — Test before going live',
+          codeExample: {
+            language: 'bash',
+            code: `curl -X POST http://localhost:3000/api/v1/simulate/rule-test \\
+  -H "X-API-Key: dev-key-001" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "rule": {
+      "trigger": {
+        "event": "transaction.received",
+        "conditions": [{ "field": "amount", "operator": "gte", "value": 100000 }]
+      },
+      "action": { "type": "allocate", "params": { "buckets": [] } }
+    },
+    "sampleTransactions": [
+      { "amount": 50000, "source": "invoice" },
+      { "amount": 100000, "source": "invoice" },
+      { "amount": 150000, "source": "transfer" }
+    ]
+  }'`
+          }
+        },
+        {
+          heading: 'Step 5 — Register a webhook (optional)',
+          codeExample: {
+            language: 'bash',
+            code: `curl -X POST http://localhost:3000/api/v1/webhooks \\
+  -H "X-API-Key: dev-key-001" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "url": "https://yourapp.com/webhooks/decision",
+    "events": ["transaction.allocated", "risk.flagged"]
+  }'`
+          }
+        },
+        {
+          heading: "What's next?",
+          content: `Read full API docs, verify webhook signatures, integrate simulate/cashflow in reporting, and wire docs routes into your frontend dashboard plan.`
+        }
+      ]
+    }
+  },
+  {
     id: 'changelog',
     title: 'Changelog',
-    group: 'Other',
+    group: 'Changelog',
     content: {
       title: 'Changelog',
       sections: [

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Play, Send, CheckCircle2, AlertCircle, XCircle, ArrowRight, Database, ShieldAlert, PieChart } from 'lucide-react';
+import React, { useState } from 'react';
+import { Play, Send, CheckCircle2, AlertCircle, XCircle, ArrowRight, Database, ShieldAlert, PieChart, ShieldCheck, Terminal, Zap } from 'lucide-react';
 import { transactionService } from '../../api/services/taxflow';
 import { clsx } from 'clsx';
 
@@ -187,7 +187,7 @@ const Playground = () => {
     );
 };
 
-const PipelineNode = ({ label, active, icon: Icon, primary }) => (
+const PipelineNode = ({ label, active, icon: IconComponent, primary }) => (
     <div className="flex flex-col items-center gap-2">
         <div className={clsx(
             "w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-500",
@@ -195,7 +195,7 @@ const PipelineNode = ({ label, active, icon: Icon, primary }) => (
                 ? (primary ? "bg-primary text-white shadow-lg shadow-primary/20 scale-110" : "bg-primary/10 text-primary border border-primary/20")
                 : "bg-white text-text-muted/30 border border-surface-border"
         )}>
-            <Icon className="w-6 h-6" />
+            <IconComponent className="w-6 h-6" />
         </div>
         <span className={clsx(
             "text-[10px] font-bold uppercase tracking-widest",

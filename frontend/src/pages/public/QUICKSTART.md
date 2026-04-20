@@ -1,8 +1,8 @@
-# Decision API — Quickstart Guide
+# TaxFlow — Quickstart Guide
 
 > **Get from zero to your first allocation in under 5 minutes**
 
-This guide walks you through the five essential steps to start using the Decision API: allocating incoming payments, assessing spending risk, creating custom rules, testing them, and setting up webhooks for real-time events.
+This guide walks you through the five essential steps to start using the TaxFlow: allocating incoming payments, assessing spending risk, creating custom rules, testing them, and setting up webhooks for real-time events.
 
 ---
 
@@ -572,7 +572,7 @@ const api = axios.create({
 });
 
 async function runQuickstart() {
-  console.log('🚀 Decision API Quickstart\n');
+  console.log('🚀 TaxFlow Quickstart\n');
   
   // Step 1: Health check
   console.log('Step 1: Checking API health...');
@@ -675,7 +675,7 @@ API_KEY = 'dev-key-001'
 HEADERS = {'X-API-Key': API_KEY}
 
 def run_quickstart():
-    print('🚀 Decision API Quickstart\n')
+    print('🚀 TaxFlow Quickstart\n')
     
     # Step 1: Health check
     print('Step 1: Checking API health...')

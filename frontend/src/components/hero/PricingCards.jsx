@@ -71,7 +71,7 @@ export default function PricingCards() {
               key={plan.name}
               className={`relative rounded-2xl p-8 ${
                 plan.highlighted
-                  ? 'bg-indigo-600 text-white ring-4 ring-indigo-200'
+                  ? 'bg-[#534AB7] text-white ring-4 ring-[#534AB7]/20'
                   : 'bg-slate-50 border border-slate-200'
               }`}
             >
@@ -90,12 +90,12 @@ export default function PricingCards() {
                     {plan.price}
                   </span>
                   {plan.period && (
-                    <span className={plan.highlighted ? 'text-indigo-200' : 'text-slate-500'}>
+                    <span className={plan.highlighted ? 'text-violet-100' : 'text-slate-500'}>
                       {plan.period}
                     </span>
                   )}
                 </div>
-                <p className={`mt-2 text-sm ${plan.highlighted ? 'text-indigo-200' : 'text-slate-600'}`}>
+                <p className={`mt-2 text-sm ${plan.highlighted ? 'text-violet-100' : 'text-slate-600'}`}>
                   {plan.description}
                 </p>
               </div>
@@ -104,7 +104,7 @@ export default function PricingCards() {
                 {plan.features.map((feature) => (
                   <li key={feature} className="flex items-start gap-3">
                     <Check className={`w-5 h-5 flex-shrink-0 ${plan.highlighted ? 'text-emerald-300' : 'text-emerald-600'}`} />
-                    <span className={`text-sm ${plan.highlighted ? 'text-indigo-100' : 'text-slate-600'}`}>
+                    <span className={`text-sm ${plan.highlighted ? 'text-violet-50' : 'text-slate-600'}`}>
                       {feature}
                     </span>
                   </li>

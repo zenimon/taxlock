@@ -5,7 +5,7 @@ import AppShell from '../../components/layout/AppShell';
 import Card, { CardContent } from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import Spinner from '../../components/ui/Spinner';
-import Modal from '../../components/ui/Modal';
+import { Modal } from '../../components/ui/Modal';
 import EmptyState from '../../components/ui/EmptyState';
 
 const RulesList = ({ rules, onEdit, onDelete, onToggle }) => {

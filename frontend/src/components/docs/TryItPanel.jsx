@@ -6,7 +6,10 @@ import { Play, Loader2, AlertCircle } from 'lucide-react';
  * Live request playground for testing API endpoints
  */
 const TryItPanel = ({ method, path, requestBody: defaultRequestBody, queryParams }) => {
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem('decision_api_key') || 'dev-key-001');
+  const [apiKey, setApiKey] = useState(() => {
+    if (typeof window === 'undefined') return 'dev-key-001';
+    return localStorage.getItem('decision_api_key') || 'dev-key-001';
+  });
   const [requestBody, setRequestBody] = useState(defaultRequestBody ? JSON.stringify(defaultRequestBody, null, 2) : '{}');
   const [queryParamValues, setQueryParamValues] = useState({});
   const [response, setResponse] = useState(null);
@@ -15,7 +18,9 @@ const TryItPanel = ({ method, path, requestBody: defaultRequestBody, queryParams
 
   // Persist API key to localStorage
   useEffect(() => {
-    localStorage.setItem('decision_api_key', apiKey);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('decision_api_key', apiKey);
+    }
   }, [apiKey]);
 
   // Initialize query param values
@@ -30,7 +35,7 @@ const TryItPanel = ({ method, path, requestBody: defaultRequestBody, queryParams
   }, [queryParams]);
 
   const buildUrl = () => {
-    const baseUrl = 'http://localhost:3000/api/v1';
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api/v1';
     let url = `${baseUrl}${path}`;
 
     if (queryParams && Object.keys(queryParamValues).length > 0) {
@@ -89,29 +94,29 @@ const TryItPanel = ({ method, path, requestBody: defaultRequestBody, queryParams
   };
 
   const getStatusColor = (status) => {
-    if (status >= 200 && status < 300) return 'text-green-600 dark:text-green-400';
-    if (status >= 400 && status < 500) return 'text-amber-600 dark:text-amber-400';
-    if (status >= 500) return 'text-red-600 dark:text-red-400';
-    return 'text-gray-600 dark:text-gray-400';
+    if (status >= 200 && status < 300) return 'text-green-600';
+    if (status >= 400 && status < 500) return 'text-amber-600';
+    if (status >= 500) return 'text-red-600';
+    return 'text-gray-600';
   };
 
   return (
-    <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-4 mb-8">
-      <h3 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+    <div className="bg-white border border-gray-200 rounded-lg p-4 mb-8">
+      <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
         <Play className="w-4 h-4" />
         Try it out
       </h3>
 
       {/* API Key input */}
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
           API Key
         </label>
         <input
           type="password"
           value={apiKey}
           onChange={(e) => setApiKey(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm font-mono focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 text-sm font-mono focus:ring-2 focus:ring-[#534AB7] focus:border-transparent"
           placeholder="dev-key-001"
         />
       </div>
@@ -119,7 +124,7 @@ const TryItPanel = ({ method, path, requestBody: defaultRequestBody, queryParams
       {/* Query parameters */}
       {queryParams && queryParams.length > 0 && (
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Query Parameters
           </label>
           <div className="space-y-2">
@@ -133,7 +138,7 @@ const TryItPanel = ({ method, path, requestBody: defaultRequestBody, queryParams
                     [param.name]: e.target.value
                   }))}
                   placeholder={param.name}
-                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm font-mono focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 text-sm font-mono focus:ring-2 focus:ring-[#534AB7] focus:border-transparent"
                 />
               </div>
             ))}
@@ -144,14 +149,14 @@ const TryItPanel = ({ method, path, requestBody: defaultRequestBody, queryParams
       {/* Request body */}
       {(method === 'POST' || method === 'PUT') && (
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Request Body (JSON)
           </label>
           <textarea
             value={requestBody}
             onChange={(e) => setRequestBody(e.target.value)}
             rows={8}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm font-mono focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 text-sm font-mono focus:ring-2 focus:ring-[#534AB7] focus:border-transparent"
           />
         </div>
       )}
@@ -160,7 +165,7 @@ const TryItPanel = ({ method, path, requestBody: defaultRequestBody, queryParams
       <button
         onClick={handleSend}
         disabled={loading}
-        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white rounded-md font-medium transition-colors"
+        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[#534AB7] hover:bg-[#463f9c] disabled:bg-[#534AB7]/60 text-white rounded-md font-medium transition-colors"
       >
         {loading ? (
           <>
@@ -177,15 +182,15 @@ const TryItPanel = ({ method, path, requestBody: defaultRequestBody, queryParams
 
       {/* Response */}
       {(response || error) && (
-        <div className="mt-6 border-t border-gray-200 dark:border-gray-800 pt-4">
-          <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Response</h4>
+        <div className="mt-6 border-t border-gray-200 pt-4">
+          <h4 className="text-sm font-semibold text-gray-900 mb-3">Response</h4>
 
           {error ? (
-            <div className="flex items-start gap-3 p-3 bg-red-50 dark:bg-red-900/20 rounded-md">
-              <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+            <div className="flex items-start gap-3 p-3 bg-red-50 rounded-md">
+              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-sm font-medium text-red-800 dark:text-red-300">{error.name}</p>
-                <p className="text-sm text-red-600 dark:text-red-400">{error.message}</p>
+                <p className="text-sm font-medium text-red-800">{error.name}</p>
+                <p className="text-sm text-red-600">{error.message}</p>
               </div>
             </div>
           ) : (
@@ -194,7 +199,7 @@ const TryItPanel = ({ method, path, requestBody: defaultRequestBody, queryParams
                 <span className={`font-mono font-semibold ${getStatusColor(response.status)}`}>
                   {response.status} {response.statusText}
                 </span>
-                <span className="text-gray-500 dark:text-gray-400">
+                <span className="text-gray-500">
                   {response.duration}ms
                 </span>
               </div>
@@ -209,4 +214,38 @@ const TryItPanel = ({ method, path, requestBody: defaultRequestBody, queryParams
   );
 };
 
-export default TryItPanel;
+class TryItPanelErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error) {
+    console.error('TryItPanel rendering error:', error);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-sm text-red-700">
+            Try It panel failed to render. Reload the page and try again.
+          </p>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+const TryItPanelWithBoundary = (props) => (
+  <TryItPanelErrorBoundary>
+    <TryItPanel {...props} />
+  </TryItPanelErrorBoundary>
+);
+
+export default TryItPanelWithBoundary;

@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+
 
 const Drawer = ({ isOpen, onClose, title, children, size = 'md' }) => {
   if (!isOpen) return null;
@@ -13,7 +13,7 @@ const Drawer = ({ isOpen, onClose, title, children, size = 'md' }) => {
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
       <div className="absolute inset-0 bg-black bg-opacity-50" onClick={onClose} />
-      
+
       <div className={`fixed inset-y-0 right-0 flex max-w-full ${sizes[size]}`}>
         <div className="flex h-full w-screen flex-col bg-white shadow-xl">
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
@@ -27,7 +27,7 @@ const Drawer = ({ isOpen, onClose, title, children, size = 'md' }) => {
               </svg>
             </button>
           </div>
-          
+
           <div className="flex-1 overflow-y-auto px-6 py-4">
             {children}
           </div>

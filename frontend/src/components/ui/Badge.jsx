@@ -1,9 +1,4 @@
-import { clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-
-export function cn(...inputs) {
-  return twMerge(clsx(inputs));
-}
+import { cn } from '../../lib/utils';
 
 export function Badge({ children, variant = 'default', className }) {
   const variants = {
@@ -11,7 +6,7 @@ export function Badge({ children, variant = 'default', className }) {
     success: 'bg-emerald-100 text-emerald-700',
     warning: 'bg-amber-100 text-amber-700',
     danger: 'bg-red-100 text-red-700',
-    indigo: 'bg-indigo-100 text-indigo-700',
+    indigo: 'bg-[#534AB7]/10 text-[#534AB7]',
   };
 
   return (
@@ -37,7 +32,7 @@ export function Spinner({ size = 'md', className }) {
   };
 
   return (
-    <svg className={cn('animate-spin text-indigo-600', sizes[size], className)} fill="none" viewBox="0 0 24 24">
+    <svg className={cn('animate-spin text-[#534AB7]', sizes[size], className)} fill="none" viewBox="0 0 24 24">
       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
     </svg>
@@ -60,7 +55,7 @@ export function StatusPill({ status }) {
     success: 'bg-emerald-100 text-emerald-700',
     pending: 'bg-amber-100 text-amber-700',
     failed: 'bg-red-100 text-red-700',
-    processing: 'bg-indigo-100 text-indigo-700',
+    processing: 'bg-[#534AB7]/10 text-[#534AB7]',
   };
 
   return (

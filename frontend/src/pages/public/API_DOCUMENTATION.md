@@ -1,4 +1,4 @@
-# Decision API — Complete Documentation
+# TaxFlow — Complete Documentation
 
 > **Version:** 1.0.0 · **Base URL:** `https://api.decisionapi.dev/v1` · **Local:** `http://localhost:3000/api/v1`
 
@@ -37,9 +37,9 @@
 
 ## Introduction
 
-The **Decision API** is an embedded financial intelligence layer for small and medium businesses. It sits between money flowing in and money going out — every transaction is automatically allocated across fund buckets (tax, operations, growth capital) and every proposed spend is risk-assessed before it leaves.
+The **TaxFlow** is an embedded financial intelligence layer for small and medium businesses. It sits between money flowing in and money going out — every transaction is automatically allocated across fund buckets (tax, operations, growth capital) and every proposed spend is risk-assessed before it leaves.
 
-**The core problem it solves:** Most SMBs mix all funds in a single account and make spending decisions without understanding their future obligations. The Decision API prevents this by:
+**The core problem it solves:** Most SMBs mix all funds in a single account and make spending decisions without understanding their future obligations. The TaxFlow prevents this by:
 
 - Automatically splitting every incoming payment the moment it arrives
 - Scoring every proposed expense against current balances and historical patterns
@@ -1163,7 +1163,7 @@ Returns the delivery log for a webhook — useful for debugging failed events.
 
 ## Code examples
 
-### Complete integration — Razorpay webhook → Decision API
+### Complete integration — Razorpay webhook → TaxFlow
 
 This shows a real-world pattern: when a Razorpay payment webhook arrives, allocate the funds and log the result.
 
@@ -1196,7 +1196,7 @@ app.post('/webhooks/razorpay',
 
     const payment = event.payload.payment.entity;
 
-    // 2. Allocate via Decision API
+    // 2. Allocate via TaxFlow
     try {
       const { data } = await decisionApi.post('/transaction/allocate', {
         transactionId: payment.id,

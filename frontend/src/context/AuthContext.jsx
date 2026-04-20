@@ -1,46 +1,52 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState } from 'react';
 import apiClient from '../services/api';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [auth, setAuth] = useState({
-    isAuthenticated: false,
-    tenant: null,
-    apiKey: null,
-    isLoading: true,
-  });
-
-  useEffect(() => {
+  const [auth, setAuth] = useState(() => {
     const storedApiKey = localStorage.getItem('apiKey');
     const storedTenant = localStorage.getItem('tenant');
 
     if (storedApiKey && storedTenant) {
-      setAuth({
-        isAuthenticated: true,
-        tenant: JSON.parse(storedTenant),
-        apiKey: storedApiKey,
-        isLoading: false,
-      });
-    } else {
-      setAuth((prev) => ({ ...prev, isLoading: false }));
+      try {
+        return {
+          isAuthenticated: true,
+          tenant: JSON.parse(storedTenant),
+          apiKey: storedApiKey,
+          isLoading: false,
+        };
+      } catch {
+        return {
+          isAuthenticated: false,
+          tenant: null,
+          apiKey: null,
+          isLoading: false,
+        };
+      }
     }
-  }, []);
+    return {
+      isAuthenticated: false,
+      tenant: null,
+      apiKey: null,
+      isLoading: false,
+    };
+  });
 
   const login = async (email, password) => {
     const response = await apiClient.post('/auth/login', { email, password });
     const { tenant, apiKey } = response.data;
-    
+
     localStorage.setItem('apiKey', apiKey);
     localStorage.setItem('tenant', JSON.stringify(tenant));
-    
+
     setAuth({
       isAuthenticated: true,
       tenant,
       apiKey,
       isLoading: false,
     });
-    
+
     return response.data;
   };
 
@@ -51,17 +57,17 @@ export function AuthProvider({ children }) {
       password,
     });
     const { tenant, apiKey } = response.data;
-    
+
     localStorage.setItem('apiKey', apiKey);
     localStorage.setItem('tenant', JSON.stringify(tenant));
-    
+
     setAuth({
       isAuthenticated: true,
       tenant,
       apiKey,
       isLoading: false,
     });
-    
+
     return response.data;
   };
 

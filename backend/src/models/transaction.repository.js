@@ -9,59 +9,61 @@
  * and tests with zero external dependencies.
  */
 
+import { TransactionModel, IdempotencyModel, BalancesModel } from "./schemas/transaction.model.js";
 import { generateId } from "../utils/generateId.js";
 
-// In-memory store — replace with DB queries in production
-const store = {
-  allocations: new Map(),       // key: allocationId
-  idempotencyKeys: new Map(),   // key: `${tenantId}:${key}` → allocationId
-  bucketBalances: new Map(),    // key: tenantId → { tax, operations, growth }
-};
-
 export class TransactionRepository {
-  /**
-   * Save a completed allocation decision.
-   */
   static async saveAllocation(tenantId, allocation, idempotencyKey = null) {
-    const record = { ...allocation, tenantId };
-    store.allocations.set(allocation.allocationId, record);
+    const record = await TransactionModel.create({ ...allocation, tenantId });
 
     if (idempotencyKey) {
-      store.idempotencyKeys.set(`${tenantId}:${idempotencyKey}`, record);
+      await IdempotencyModel.create({
+        key: `${tenantId}:${idempotencyKey}`,
+        allocationId: allocation.allocationId
+      });
     }
 
     // Update bucket balances
     await TransactionRepository._updateBucketBalances(tenantId, allocation.allocations);
 
-    return record;
+    return record.toObject();
   }
 
-  /**
-   * Find a cached allocation by idempotency key.
-   */
   static async findByIdempotencyKey(tenantId, key) {
-    return store.idempotencyKeys.get(`${tenantId}:${key}`) ?? null;
+    const entry = await IdempotencyModel.findOne({ key: `${tenantId}:${key}` });
+    if (!entry) return null;
+    return await TransactionModel.findOne({ allocationId: entry.allocationId }).lean();
   }
 
   /**
    * Paginated list of allocations for a tenant.
    */
   static async listAllocations(tenantId, { page, limit, from, to, bucket }) {
-    let records = [...store.allocations.values()]
-      .filter((r) => r.tenantId === tenantId)
-      .sort((a, b) => new Date(b.processedAt) - new Date(a.processedAt));
+    const query = { tenantId };
+    if (from || to) {
+      query.processedAt = {};
+      if (from) query.processedAt.$gte = new Date(from);
+      if (to) query.processedAt.$lte = new Date(to);
+    }
+    if (bucket) {
+      query.allocations = { $elemMatch: { bucket } };
+    }
 
-    if (from) records = records.filter((r) => r.processedAt >= from);
-    if (to)   records = records.filter((r) => r.processedAt <= to);
-    if (bucket) records = records.filter((r) =>
-      r.allocations.some((a) => a.bucket === bucket)
-    );
+    const total = await TransactionModel.countDocuments(query);
+    const records = await TransactionModel.find(query)
+      .sort({ processedAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean();
 
-    const total = records.length;
-    const data = records.slice((page - 1) * limit, page * limit);
+    const data = records.map(r => ({
+      ...r,
+      id: r.allocationId,
+      timestamp: r.processedAt
+    }));
 
     return {
-      data,
+      transactions: data,
       pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
     };
   }
@@ -70,30 +72,13 @@ export class TransactionRepository {
    * Current bucket balances for a tenant.
    */
   static async getBucketBalances(tenantId) {
-    return store.bucketBalances.get(tenantId) ?? {
-      tax:        { balance: 0, percentage: 0 },
+    const entry = await BalancesModel.findOne({ tenantId }).lean();
+    return entry?.balances ?? {
+      tax: { balance: 0, percentage: 0 },
       operations: { balance: 0, percentage: 0 },
-      growth:     { balance: 0, percentage: 0 },
+      growth: { balance: 0, percentage: 0 },
     };
   }
-
-  /**
-   * 30-day average spend by category for a tenant.
-   */
-  static async getMonthlyAvgByCategory(tenantId, category) {
-    // Stub — in production, query aggregated spend data
-    return 0;
-  }
-
-  /**
-   * Transaction history with a specific vendor.
-   */
-  static async getVendorHistory(tenantId, vendorId) {
-    // Stub — in production, query vendor-tagged transactions
-    return { vendorId, transactionCount: 0, totalSpend: 0 };
-  }
-
-  // ── Private ────────────────────────────────────────────────────────────────
 
   static async _updateBucketBalances(tenantId, allocations) {
     const current = await TransactionRepository.getBucketBalances(tenantId);
@@ -106,7 +91,6 @@ export class TransactionRepository {
       updated[alloc.bucket].balance += alloc.amount;
     }
 
-    // Recalculate percentages
     const total = Object.values(updated).reduce((s, b) => s + b.balance, 0);
     if (total > 0) {
       for (const key of Object.keys(updated)) {
@@ -114,6 +98,19 @@ export class TransactionRepository {
       }
     }
 
-    store.bucketBalances.set(tenantId, updated);
+    await BalancesModel.findOneAndUpdate(
+      { tenantId },
+      { $set: { balances: updated, updatedAt: new Date() } },
+      { upsert: true }
+    );
+  }
+
+  /**
+   * Reset the in-memory store (Dev/Test only).
+   */
+  static async clear() {
+    await TransactionModel.deleteMany({});
+    await IdempotencyModel.deleteMany({});
+    await BalancesModel.deleteMany({});
   }
 }

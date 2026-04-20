@@ -4,7 +4,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import Hero from '../pages/public/Hero';
 import Login from '../pages/public/Login';
 import Signup from '../pages/public/Signup';
-import Docs from '../pages/public/Docs';
+import Docs from '../pages/Docs';
 
 // Protected app pages
 import Dashboard from '../pages/app/Dashboard';
@@ -48,7 +48,7 @@ export const router = createBrowserRouter([
     element: <Docs />,
   },
   {
-    path: '/docs/:section',
+    path: '/docs/*',
     element: <Docs />,
   },
 

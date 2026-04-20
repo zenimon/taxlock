@@ -12,7 +12,7 @@ export default function Hero() {
   return (
     <div className="min-h-screen bg-white">
       <PublicNav />
-      
+
       <main className="pt-16">
         <HeroSection />
         <FeatureGrid />
@@ -58,7 +58,7 @@ export default function Hero() {
             </div>
           </div>
           <div className="mt-8 pt-8 border-t border-slate-200 text-center text-sm text-slate-500">
-            © 2024 Decision API. All rights reserved.
+            © 2024 TaxFlow. All rights reserved.
           </div>
         </div>
       </footer>

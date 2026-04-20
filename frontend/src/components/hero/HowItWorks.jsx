@@ -9,9 +9,9 @@ const steps = [
   },
   {
     icon: Zap,
-    title: 'Decision API Fires',
+    title: 'TaxFlow Fires',
     description: 'Your rules engine evaluates the transaction and determines the optimal allocation split.',
-    color: 'bg-indigo-100 text-indigo-600',
+    color: 'bg-[#534AB7]/10 text-[#534AB7]',
   },
   {
     icon: PieChart,
@@ -34,21 +34,22 @@ export default function HowItWorks() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-          {/* Connection line for desktop */}
-          <div className="hidden md:block absolute top-12 left-[16%] right-[16%] h-0.5 bg-gradient-to-r from-emerald-200 via-indigo-200 to-amber-200" />
-          
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
           {steps.map((step, index) => (
             <div key={step.title} className="relative">
+              {/* Arrow for desktop */}
+              {index < steps.length - 1 && (
+                <div className="hidden md:flex absolute top-12 -right-6 translate-x-1/2 z-20 items-center justify-center">
+                  <ArrowRight className="w-8 h-8 text-slate-300" />
+                </div>
+              )}
+
               <div className="flex flex-col items-center text-center">
                 <div className={`w-24 h-24 ${step.color} rounded-2xl flex items-center justify-center mb-6 relative z-10`}>
                   <step.icon className="w-12 h-12" />
                 </div>
-                <div className="absolute -top-2 -right-2 w-8 h-8 bg-slate-900 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                  {index + 1}
-                </div>
                 <h3 className="text-xl font-semibold text-slate-900 mb-2">{step.title}</h3>
-                <p className="text-slate-600">{step.description}</p>
+                <p className="text-slate-600 px-4">{step.description}</p>
               </div>
             </div>
           ))}

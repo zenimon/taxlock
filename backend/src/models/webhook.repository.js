@@ -1,60 +1,61 @@
 /**
  * models/webhook.repository.js
  */
+import { WebhookModel, DeliveryModel } from "./schemas/webhook.model.js";
 import { generateId } from "../utils/generateId.js";
 import crypto from "crypto";
 
-const webhooks = new Map();     // tenantId → Webhook[]
-const deliveries = new Map();   // webhookId → DeliveryLog[]
-
 export class WebhookRepository {
   static async listByTenant(tenantId) {
-    return (webhooks.get(tenantId) ?? []).map(({ secret: _s, ...w }) => w); // never expose secret
+    return await WebhookModel.find({ tenantId }).select("-secret").lean();
   }
 
   static async getSubscribedWebhooks(tenantId, event) {
-    return (webhooks.get(tenantId) ?? []).filter((w) => w.enabled && w.events.includes(event));
+    return await WebhookModel.find({ tenantId, enabled: true, events: event }).lean();
   }
 
   static async create(tenantId, { url, events, secret }) {
-    const list = webhooks.get(tenantId) ?? [];
-    const webhook = {
-      id: generateId("wh"),
+    const id = generateId("wh");
+    const webhook = await WebhookModel.create({
+      id,
+      tenantId,
       url,
       events,
-      secret: crypto.createHash("sha256").update(secret).digest("hex"), // store hashed
-      _rawSecret: secret, // in prod, store only the hash and return raw once
+      secret: crypto.createHash("sha256").update(secret).digest("hex"),
       enabled: true,
-      createdAt: new Date().toISOString(),
-    };
-    list.push(webhook);
-    webhooks.set(tenantId, list);
-    return webhook;
+    });
+    return webhook.toObject();
   }
 
   static async remove(tenantId, webhookId) {
-    const list = webhooks.get(tenantId) ?? [];
-    const idx = list.findIndex((w) => w.id === webhookId);
-    if (idx === -1) return false;
-    list.splice(idx, 1);
-    webhooks.set(tenantId, list);
-    return true;
+    const res = await WebhookModel.deleteOne({ tenantId, id: webhookId });
+    return res.deletedCount > 0;
   }
 
   static async logDelivery(webhookId, event, log) {
-    const list = deliveries.get(webhookId) ?? [];
-    list.unshift({ ...log, event, loggedAt: new Date().toISOString() });
-    deliveries.set(webhookId, list.slice(0, 100)); // keep last 100
+    const entry = await DeliveryModel.findOneAndUpdate(
+      { webhookId },
+      {
+        $push: {
+          logs: {
+            $each: [{ ...log, event, loggedAt: new Date() }],
+            $position: 0,
+            $slice: 100
+          }
+        }
+      },
+      { upsert: true, new: true }
+    );
   }
 
   static async getDeliveries(tenantId, webhookId, { status } = {}) {
-    const list = deliveries.get(webhookId) ?? [];
-    if (!status) return list;
-    return list.filter((d) => {
-      if (status === "delivered") return d.success;
-      if (status === "failed") return !d.success;
-      return true;
-    });
+    const entry = await DeliveryModel.findOne({ webhookId }).lean();
+    if (!entry) return [];
+
+    let logs = entry.logs;
+    if (status === "delivered") logs = logs.filter((d) => d.success);
+    if (status === "failed") logs = logs.filter((d) => !d.success);
+    return logs;
   }
 
   static async markFailed(webhookId, event) {

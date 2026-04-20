@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 
 /**
  * OnThisPage Component
  * Right column anchor navigation that extracts headings from content
  * and highlights the active section as user scrolls
  */
-const OnThisPage = ({ contentRef }) => {
+const OnThisPage = ({ contentRef, watchKey }) => {
   const [headings, setHeadings] = useState([]);
   const [activeId, setActiveId] = useState('');
 
@@ -38,7 +38,7 @@ const OnThisPage = ({ contentRef }) => {
     elements.forEach(el => observer.observe(el));
 
     return () => observer.disconnect();
-  }, [contentRef]);
+  }, [contentRef, watchKey]);
 
   const scrollToHeading = (id) => {
     const element = document.getElementById(id);
@@ -55,17 +55,16 @@ const OnThisPage = ({ contentRef }) => {
   return (
     <aside className="hidden xl:block w-52 sticky top-24 self-start">
       <nav aria-label="On this page" className="text-sm">
-        <h4 className="font-semibold text-gray-900 dark:text-white mb-4">On this page</h4>
-        <ul className="space-y-2 border-l-2 border-gray-200 dark:border-gray-800">
+        <h4 className="font-semibold text-gray-900 mb-4">On this page</h4>
+        <ul className="space-y-2 border-l-2 border-gray-200">
           {headings.map(heading => (
             <li key={heading.id} className={`${heading.level === 'h3' ? 'pl-4' : ''}`}>
               <button
                 onClick={() => scrollToHeading(heading.id)}
-                className={`block py-1 transition-colors border-l-2 -ml-[2px] ${
-                  activeId === heading.id
-                    ? 'border-purple-600 text-purple-600 dark:text-purple-400 font-medium'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
-                }`}
+                className={`block py-1 transition-colors border-l-2 -ml-[2px] ${activeId === heading.id
+                    ? 'border-[#534AB7] text-[#534AB7] font-medium'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                  }`}
               >
                 {heading.text}
               </button>

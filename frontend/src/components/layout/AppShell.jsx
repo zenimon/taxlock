@@ -1,12 +1,9 @@
 import { Zap, LayoutDashboard, Receipt, Shield, Sliders, Settings as SettingsIcon, LogOut } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
 import { useAuth } from '../../context/AuthContext';
+import { cn } from '../../lib/utils';
 
-export function cn(...inputs) {
-  return twMerge(clsx(inputs));
-}
+import logo from '../../assets/logo.png';
 
 const navItems = [
   { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
@@ -23,10 +20,8 @@ export function Sidebar() {
   return (
     <div className="w-64 border-r border-slate-200 bg-white h-screen flex flex-col sticky top-0">
       <div className="p-6 flex items-center gap-3">
-        <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-          <Zap className="text-white w-5 h-5" />
-        </div>
-        <span className="font-bold text-xl text-slate-900">Decision API</span>
+        <img src={logo} alt="TaxFlow" className="w-8 h-8 rounded-lg" />
+        <span className="font-bold text-xl text-slate-900">TaxFlow</span>
       </div>
 
       <nav className="flex-1 px-4 space-y-1 mt-4">
@@ -38,7 +33,7 @@ export function Sidebar() {
               cn(
                 'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all',
                 isActive
-                  ? 'bg-indigo-50 text-indigo-600'
+                  ? 'bg-[#534AB7]/10 text-[#534AB7]'
                   : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
               )
             }

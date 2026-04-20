@@ -20,9 +20,9 @@ import { generateId } from "../utils/generateId.js";
 
 // Default allocation when no rules match — sensible starting point for Indian SMBs
 const DEFAULT_ALLOCATION = [
-  { bucket: "tax",        percentage: 18, reason: "Default GST reserve" },
+  { bucket: "tax", percentage: 18, reason: "Default GST reserve" },
   { bucket: "operations", percentage: 52, reason: "Default operational float" },
-  { bucket: "growth",     percentage: 30, reason: "Default growth capital" },
+  { bucket: "growth", percentage: 30, reason: "Default growth capital" },
 ];
 
 export class AllocationService {
@@ -43,8 +43,8 @@ export class AllocationService {
       throw new AppError("VALIDATION_ERROR", "amount must be a positive number", 400);
     }
 
-    // 1. Fetch all active rules for this tenant, ordered by priority ASC
-    const rules = await RulesRepository.getActiveTenantRules(tenantId, "transaction.received");
+    // 1. Fetch all active rules for this tenant
+    const rules = await RulesRepository.getActiveTenantRules(tenantId, "allocate");
 
     // 2. Run rules engine — returns first matching rule's action or null
     const context = { amount, currency, source, metadata };
@@ -52,7 +52,7 @@ export class AllocationService {
 
     // 3. Determine bucket split
     const rawBuckets = matchedRule
-      ? AllocationService._applyRuleAction(matchedRule.action)
+      ? AllocationService._applyRuleAction(matchedRule)
       : DEFAULT_ALLOCATION;
 
     // 4. Normalize percentages to exactly 100
@@ -67,6 +67,7 @@ export class AllocationService {
     return {
       allocationId: generateId("alloc"),
       transactionId,
+      amount,
       totalAmount: amount,
       currency,
       allocations,
@@ -89,7 +90,7 @@ export class AllocationService {
       : null;
 
     const rawBuckets = matchedRule
-      ? AllocationService._applyRuleAction(matchedRule.action)
+      ? AllocationService._applyRuleAction(matchedRule)
       : DEFAULT_ALLOCATION;
 
     const normalized = AllocationService._normalize(rawBuckets);
@@ -107,23 +108,38 @@ export class AllocationService {
 
   // ── Private helpers ────────────────────────────────────────────────────────
 
-  static _applyRuleAction(action) {
-    if (action.type !== "allocate") {
-      // Non-allocation actions (block, flag) fall through to default
+  static _applyRuleAction(rule) {
+    // Handle new flatten structure (actionType + actionParams)
+    if (rule.actionType === "allocate" && rule.actionParams) {
+      return Object.entries(rule.actionParams).map(([bucket, percentage]) => ({
+        bucket,
+        percentage,
+        reason: `Rule: ${rule.name}`,
+      }));
+    }
+
+    // Handle legacy nested structure (actions: [{ type, params: { buckets } }])
+    const action = rule.action || (rule.actions && rule.actions[0]);
+    if (!action || action.type !== "allocate") {
       return DEFAULT_ALLOCATION;
     }
-    return action.params.buckets.map((b) => ({
+
+    const buckets = action.params?.buckets || action.buckets;
+    if (!buckets) return DEFAULT_ALLOCATION;
+
+    return buckets.map((b) => ({
       ...b,
       reason: b.reason ?? `Rule: custom allocation`,
     }));
   }
 
   static _normalize(buckets) {
-    const total = buckets.reduce((sum, b) => sum + b.percentage, 0);
+    if (!buckets || !Array.isArray(buckets)) return DEFAULT_ALLOCATION;
+    const total = buckets.reduce((sum, b) => sum + (b?.percentage ?? 0), 0);
     if (total === 0) return DEFAULT_ALLOCATION;
     return buckets.map((b) => ({
       ...b,
-      percentage: parseFloat(((b.percentage / total) * 100).toFixed(4)),
+      percentage: parseFloat((((b?.percentage ?? 0) / total) * 100).toFixed(4)),
     }));
   }
 }

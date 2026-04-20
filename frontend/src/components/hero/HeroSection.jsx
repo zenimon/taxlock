@@ -43,7 +43,7 @@ export default function HeroSection() {
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-6xl font-bold text-slate-900 mb-6 leading-tight">
             Smart Money Allocation<br />
-            <span className="text-indigo-600">Powered by Rules</span>
+            <span className="text-[#534AB7]">Powered by Rules</span>
           </h1>
           <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-8">
             Automatically split incoming revenue into buckets for tax, operations, and growth.

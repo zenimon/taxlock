@@ -3,8 +3,8 @@
     "version": "1.0.0",
     "description": "TaxFlow unified workspace",
     "scripts": {
-        "install:all": "npm install --prefix money-back && npm install --prefix frontend",
-        "dev:backend": "npm run dev --prefix money-back",
+        "install:all": "npm install --prefix backend && npm install --prefix frontend",
+        "dev:backend": "npm run dev --prefix backend",
         "dev:frontend": "npm run dev --prefix frontend",
         "dev": "npx concurrently \"npm run dev:backend\" \"npm run dev:frontend\""
     },

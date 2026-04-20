@@ -1,7 +1,7 @@
 /**
  * docs/swagger.js
  *
- * Builds the full OpenAPI 3.0 specification for the Decision API.
+ * Builds the full OpenAPI 3.0 specification for TaxFlow.
  * This file is the single source of documentation — every endpoint,
  * schema, and example lives here so docs are always in sync with the code.
  *
@@ -12,12 +12,12 @@
 export const swaggerSpec = {
   openapi: "3.0.3",
   info: {
-    title: "Decision API",
+    title: "TaxFlow API",
     version: "1.0.0",
     description: `
 ## Overview
 
-The **Decision API** is an embedded financial intelligence layer for small and medium businesses.
+The **TaxFlow API** is an embedded financial intelligence layer for small and medium businesses.
 It intercepts every money event in real time and returns allocation decisions, risk scores,
 and spend approvals — so businesses never move money blindly.
 
@@ -59,15 +59,15 @@ All errors follow a consistent shape:
 Register a URL via \`POST /webhooks\` to receive real-time push events when allocations, risk flags, or rule triggers occur.
     `,
     contact: {
-      name: "Decision API Support",
-      email: "api@decisionapi.dev",
+      name: "TaxFlow Support",
+      email: "api@taxflow.dev",
     },
     license: { name: "MIT" },
   },
 
   servers: [
     { url: "http://localhost:3000/api/v1", description: "Local development" },
-    { url: "https://api.decisionapi.dev/v1", description: "Production" },
+    { url: "https://api.taxflow.dev/v1", description: "Production" },
   ],
 
   security: [{ ApiKeyAuth: [] }],

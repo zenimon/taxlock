@@ -41,7 +41,7 @@ const SignupForm = ({ onSuccess }) => {
       await signup(data.businessName, data.email, data.password);
       onSuccess?.();
     } catch (err) {
-      setError(err.response?.data?.message || 'Signup failed. Please try again.');
+      setError(err.response?.data?.error?.message || 'Signup failed. Please try again.');
     } finally {
       setIsLoading(false);
     }

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { clsx } from 'clsx';
 import { TrendingUp, Calendar, Wallet, ArrowUpRight, ArrowDownLeft, Info } from 'lucide-react';
 import { simulationService } from '../../api/services/taxflow';
 

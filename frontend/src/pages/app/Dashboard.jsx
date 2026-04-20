@@ -56,7 +56,7 @@ const BucketBalanceCards = ({ transactions }) => {
   );
 };
 
-const CashflowChart = ({ transactions }) => {
+const CashflowChart = () => {
   // Simplified chart placeholder
   return (
     <Card className="mb-8">
@@ -108,7 +108,7 @@ const RiskAlertBanner = () => {
 };
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  useAuth();
 
   const { data: transactions, isLoading } = useQuery({
     queryKey: ['transactions', { limit: 100 }],
@@ -135,7 +135,7 @@ const Dashboard = () => {
     <AppShell>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="text-2xl font-bold text-gray-900 mb-6">Dashboard</h1>
-        
+
         <RiskAlertBanner />
         <BucketBalanceCards transactions={transactions} />
         <CashflowChart transactions={transactions} />

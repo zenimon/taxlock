@@ -11,7 +11,7 @@ export class RulesController {
   static async list(req, res, next) {
     try {
       const rules = await RulesRepository.listByTenant(req.tenant.id);
-      return res.json({ data: rules, total: rules.length });
+      return res.json({ rules: rules, total: rules.length });
     } catch (err) { next(err); }
   }
 

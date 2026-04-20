@@ -32,7 +32,7 @@ const LoginForm = ({ onSuccess }) => {
       await login(data.email, data.password);
       onSuccess?.();
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
+      setError(err.response?.data?.error?.message || 'Login failed. Please try again.');
     } finally {
       setIsLoading(false);
     }

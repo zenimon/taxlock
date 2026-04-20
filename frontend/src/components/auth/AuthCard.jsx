@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import logo from '../../assets/logo.png';
 
 const AuthCard = ({ title, subtitle, children, footer }) => {
   return (
@@ -6,11 +7,7 @@ const AuthCard = ({ title, subtitle, children, footer }) => {
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <Link to="/" className="inline-block">
-            <div className="h-12 w-12 bg-[#534AB7] rounded-xl flex items-center justify-center mx-auto">
-              <svg className="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
+            <img src={logo} alt="TaxFlow" className="h-12 w-12 rounded-xl mx-auto" />
           </Link>
           <h2 className="mt-6 text-3xl font-bold text-gray-900">{title}</h2>
           {subtitle && (

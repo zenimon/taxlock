@@ -6,55 +6,52 @@
  * touching any service or controller code.
  */
 
+import { RuleModel } from "./schemas/rule.model.js";
 import { generateId } from "../utils/generateId.js";
-
-const store = new Map(); // key: tenantId → Rule[]
 
 export class RulesRepository {
   static async listByTenant(tenantId) {
-    return (store.get(tenantId) ?? []).sort((a, b) => a.priority - b.priority);
+    return await RuleModel.find({ tenantId }).sort({ priority: 1 }).lean();
   }
 
   static async getActiveTenantRules(tenantId, event) {
-    const rules = store.get(tenantId) ?? [];
-    return rules
-      .filter((r) => r.enabled && r.trigger.event === event)
-      .sort((a, b) => a.priority - b.priority);
+    return await RuleModel.find({
+      tenantId,
+      enabled: true,
+      $or: [{ "trigger.event": event }, { triggerEvent: event }]
+    }).sort({ priority: 1 }).lean();
   }
 
   static async findById(tenantId, ruleId) {
-    return (store.get(tenantId) ?? []).find((r) => r.id === ruleId) ?? null;
+    return await RuleModel.findOne({ tenantId, id: ruleId }).lean();
   }
 
   static async create(tenantId, data) {
-    const rules = store.get(tenantId) ?? [];
-    const rule = {
-      id: generateId("rule"),
+    const id = generateId("rule");
+    const rule = await RuleModel.create({
+      id,
+      tenantId,
       ...data,
       priority: data.priority ?? 100,
       enabled: data.enabled ?? true,
-      createdAt: new Date().toISOString(),
-    };
-    rules.push(rule);
-    store.set(tenantId, rules);
-    return rule;
+    });
+    return rule.toObject();
   }
 
   static async update(tenantId, ruleId, data) {
-    const rules = store.get(tenantId) ?? [];
-    const idx = rules.findIndex((r) => r.id === ruleId);
-    if (idx === -1) return null;
-    rules[idx] = { ...rules[idx], ...data, id: ruleId };
-    store.set(tenantId, rules);
-    return rules[idx];
+    return await RuleModel.findOneAndUpdate(
+      { tenantId, id: ruleId },
+      { $set: data },
+      { new: true }
+    ).lean();
   }
 
   static async remove(tenantId, ruleId) {
-    const rules = store.get(tenantId) ?? [];
-    const idx = rules.findIndex((r) => r.id === ruleId);
-    if (idx === -1) return false;
-    rules.splice(idx, 1);
-    store.set(tenantId, rules);
-    return true;
+    const res = await RuleModel.deleteOne({ tenantId, id: ruleId });
+    return res.deletedCount > 0;
+  }
+
+  static async clear() {
+    await RuleModel.deleteMany({});
   }
 }

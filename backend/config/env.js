@@ -7,7 +7,11 @@
  */
 
 import dotenv from "dotenv";
-dotenv.config();
+import { fileURLToPath } from "url";
+import path from "path";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.join(__dirname, "../.env") });
 
 function required(key) {
   const value = process.env[key];
@@ -30,7 +34,8 @@ export const config = {
   JWT_EXPIRES_IN: optional("JWT_EXPIRES_IN", "24h"),
 
   // Database
-  DATABASE_URL: optional("DATABASE_URL", "postgresql://localhost:5432/decision_api"),
+  DATABASE_URL: optional("DATABASE_URL", "postgresql://localhost:5432/taxflow"),
+  MONGODB_URI: optional("MONGODB_URI", "mongodb://localhost:27017/taxflow"),
 
   // CORS
   ALLOWED_ORIGINS: optional("ALLOWED_ORIGINS", "*").split(","),
